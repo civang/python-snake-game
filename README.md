@@ -39,6 +39,16 @@ py main.py
 - Sound effects
 - Better graphics
 
+## Learning Goals
+
+This project is being developed to learn:
+
+- Python programming
+- Object-Oriented Programming
+- Game development with Pygame
+- Git and GitHub
+- Software project structure
+
 ## Author
 
 Shivang Dutta
