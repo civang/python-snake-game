@@ -1,6 +1,6 @@
 # Snake Game
 
-A classic Snake Game built using Python and Pygame.
+A classic Snake Game built using Python and Pygame. Enjoy the retro gaming experience!
 
 ## Features
 
