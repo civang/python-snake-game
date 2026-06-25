@@ -4,12 +4,14 @@ A classic Snake Game built using Python and Pygame. Enjoy the retro gaming exper
 
 ## Features
 
-- Snake movement
+- Start screen with instructions
+- Arrow-key snake movement
 - Food spawning
 - Score tracking
 - Collision detection
 - Wall collision
 - Self collision
+- Game over screen with replay support
 
 ## Technologies Used
 
