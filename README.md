@@ -23,7 +23,7 @@ A classic Snake Game built using Python and Pygame. Enjoy the retro gaming exper
 Install pygame:
 
 ```bash
-py -m pip install pygame
+py -m pip install -r requirements.txt
 ```
 
 Run the game:
@@ -32,9 +32,15 @@ Run the game:
 py main.py
 ```
 
+## Project Structure
+
+- `main.py` – game entry point and loop
+- `snake.py` – snake movement and collision logic
+- `food.py` – food spawning and position management
+- `settings.py` – shared game configuration constants
+
 ## Future Improvements
 
-- Game Over screen
 - High score system
 - Pause menu
 - Difficulty levels

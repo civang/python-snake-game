@@ -1,24 +1,22 @@
 ﻿import pygame
-import random
 import sys
 
-# ==========================
-# CONFIGURATION
-# ==========================
+from food import Food
+from settings import (
+    BLACK,
+    CELL_SIZE,
+    COLS,
+    FPS,
+    GREEN,
+    HEIGHT,
+    RED,
+    ROWS,
+    WHITE,
+    WIDTH,
+)
+from snake import Snake
 
 pygame.init()
-
-WIDTH = 600
-HEIGHT = 600
-CELL_SIZE = 20
-ROWS = HEIGHT // CELL_SIZE
-COLS = WIDTH // CELL_SIZE
-FPS = 10
-
-BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-WHITE = (255, 255, 255)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
@@ -29,9 +27,6 @@ title_font = pygame.font.SysFont(None, 64)
 menu_font = pygame.font.SysFont(None, 36)
 score_font = pygame.font.SysFont(None, 28)
 
-# ==========================
-# HELPERS
-# ==========================
 
 def draw_text(text, font, color, center):
     label = font.render(text, True, color)
@@ -84,11 +79,9 @@ def show_game_over_screen(score):
 
 
 def run_game():
-    snake = [(10, 10)]
-    direction = (1, 0)
-    food = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
+    snake = Snake()
+    food = Food(snake.body)
     score = 0
-
     running = True
 
     while running:
@@ -98,39 +91,23 @@ def run_game():
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP and direction != (0, 1):
-                    direction = (0, -1)
-                elif event.key == pygame.K_DOWN and direction != (0, -1):
-                    direction = (0, 1)
-                elif event.key == pygame.K_LEFT and direction != (1, 0):
-                    direction = (-1, 0)
-                elif event.key == pygame.K_RIGHT and direction != (-1, 0):
-                    direction = (1, 0)
+                if event.key == pygame.K_UP:
+                    snake.change_direction((0, -1))
+                elif event.key == pygame.K_DOWN:
+                    snake.change_direction((0, 1))
+                elif event.key == pygame.K_LEFT:
+                    snake.change_direction((-1, 0))
+                elif event.key == pygame.K_RIGHT:
+                    snake.change_direction((1, 0))
 
-        head_x, head_y = snake[0]
-        dir_x, dir_y = direction
-        new_head = (head_x + dir_x, head_y + dir_y)
+        ate_food = snake.head() == food.position
+        snake.move(grow=ate_food)
 
-        snake.insert(0, new_head)
-
-        if new_head == food:
+        if ate_food:
             score += 1
-            while True:
-                food = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
-                if food not in snake:
-                    break
-        else:
-            snake.pop()
+            food = Food(snake.body)
 
-        if (
-            new_head[0] < 0
-            or new_head[0] >= COLS
-            or new_head[1] < 0
-            or new_head[1] >= ROWS
-        ):
-            running = False
-
-        if new_head in snake[1:]:
+        if snake.is_out_of_bounds() or snake.collides_with_self():
             running = False
 
         screen.fill(BLACK)
@@ -138,10 +115,10 @@ def run_game():
         pygame.draw.rect(
             screen,
             RED,
-            (food[0] * CELL_SIZE, food[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+            (food.position[0] * CELL_SIZE, food.position[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE),
         )
 
-        for segment in snake:
+        for segment in snake.body:
             x, y = segment
             pygame.draw.rect(
                 screen,
