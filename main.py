@@ -65,15 +65,18 @@ def show_game_over_screen(score):
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    return True
+                    return "play_again"
+                if event.key == pygame.K_m:
+                    return "main_menu"
                 if event.key == pygame.K_ESCAPE:
-                    return False
+                    return "quit"
 
         screen.fill(BLACK)
-        draw_text("Game Over", title_font, RED, (WIDTH // 2, HEIGHT // 2 - 80))
-        draw_text(f"Final Score: {score}", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2))
+        draw_text("Game Over", title_font, RED, (WIDTH // 2, HEIGHT // 2 - 100))
+        draw_text(f"Final Score: {score}", title_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 20))
         draw_text("Press ENTER to play again", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 40))
-        draw_text("Press ESC to exit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 80))
+        draw_text("Press M for Main Menu", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 80))
+        draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 120))
         pygame.display.flip()
         clock.tick(15)
 
@@ -138,9 +141,18 @@ def run_game():
 def main():
     while True:
         show_start_screen()
-        final_score = run_game()
-        if not show_game_over_screen(final_score):
-            break
+
+        while True:
+            final_score = run_game()
+            choice = show_game_over_screen(final_score)
+
+            if choice == "play_again":
+                continue
+            if choice == "main_menu":
+                break
+            if choice == "quit":
+                pygame.quit()
+                sys.exit()
 
     pygame.quit()
     sys.exit()
