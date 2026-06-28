@@ -1,5 +1,8 @@
-﻿import pygame
+﻿import math
 import sys
+from array import array
+
+import pygame
 
 from food import Food
 from settings import (
@@ -18,6 +21,12 @@ from snake import Snake
 
 pygame.init()
 
+try:
+    pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=512)
+    audio_enabled = True
+except pygame.error:
+    audio_enabled = False
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
 
@@ -26,6 +35,26 @@ clock = pygame.time.Clock()
 title_font = pygame.font.SysFont(None, 64)
 menu_font = pygame.font.SysFont(None, 36)
 score_font = pygame.font.SysFont(None, 28)
+
+
+def build_tone(frequency, duration=0.12, volume=0.06):
+    if not audio_enabled:
+        return None
+
+    sample_rate = 22050
+    amplitude = int(32767 * volume)
+    sample_count = int(duration * sample_rate)
+    data = array("h")
+
+    for index in range(sample_count):
+        value = int(amplitude * math.sin(2 * math.pi * frequency * index / sample_rate))
+        data.append(value)
+
+    return pygame.mixer.Sound(buffer=data.tobytes())
+
+
+music_notes = [261.63, 329.63, 392.00, 493.88, 392.00, 329.63]
+music_sounds = [build_tone(note) for note in music_notes]
 
 
 def draw_text(text, font, color, center):
@@ -81,11 +110,29 @@ def show_game_over_screen(score):
         clock.tick(15)
 
 
+def draw_music_bar(frame_offset):
+    bar_x = WIDTH - 120
+    bar_y = 18
+    bar_width = 90
+    bar_height = 18
+
+    draw_text("Music", score_font, WHITE, (bar_x + 45, bar_y - 10))
+
+    for index in range(6):
+        wave = abs(math.sin(frame_offset + index * 0.7))
+        height = int(6 + wave * 12)
+        rect_height = max(4, height)
+        rect_y = bar_y + (bar_height - rect_height) // 2
+        rect_x = bar_x + index * 14
+        pygame.draw.rect(screen, GREEN, (rect_x, rect_y, 10, rect_height))
+
+
 def run_game():
     snake = Snake()
     food = Food(snake.body)
     score = 0
     running = True
+    music_counter = 0
 
     while running:
         for event in pygame.event.get():
@@ -132,6 +179,15 @@ def run_game():
         score_text = score_font.render(f"Score: {score}", True, WHITE)
         screen.blit(score_text, (10, 10))
 
+        frame_offset = pygame.time.get_ticks() / 240.0
+        draw_music_bar(frame_offset)
+
+        if audio_enabled and music_counter % 12 == 0:
+            note_sound = music_sounds[music_counter // 12 % len(music_sounds)]
+            if note_sound is not None:
+                note_sound.play()
+
+        music_counter += 1
         pygame.display.update()
         clock.tick(FPS)
 
