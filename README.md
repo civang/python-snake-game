@@ -52,6 +52,7 @@ py main.py
 - Leaderboard support
 - Daily challenge mode
 - Score-based speed boosts
+- Bonus food ideas
 
 ## Learning Goals
 

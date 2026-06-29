@@ -95,6 +95,7 @@ def show_start_screen():
         draw_text("Press 1/2/3 to change difficulty", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 160))
         draw_text("Press P during play to pause", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 200))
         draw_text("Eat more food to speed up", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 240))
+        draw_text("Try different difficulties", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 280))
         pygame.display.flip()
         clock.tick(15)
 
