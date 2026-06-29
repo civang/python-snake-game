@@ -50,6 +50,7 @@ py main.py
 - Obstacles and power-ups
 - Additional game modes
 - Leaderboard support
+- Daily challenge mode
 
 ## Learning Goals
 

@@ -93,6 +93,7 @@ def show_start_screen():
         draw_text(f"Current: {difficulty.title()}", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 80))
         draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 120))
         draw_text("Press 1/2/3 to change difficulty", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 160))
+        draw_text("Press P during play to pause", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 200))
         pygame.display.flip()
         clock.tick(15)
 
