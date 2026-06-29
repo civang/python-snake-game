@@ -49,6 +49,7 @@ py main.py
 - Better graphics
 - Obstacles and power-ups
 - Additional game modes
+- Leaderboard support
 
 ## Learning Goals
 
