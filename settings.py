@@ -6,6 +6,7 @@ CELL_SIZE = 20
 ROWS = HEIGHT // CELL_SIZE
 COLS = WIDTH // CELL_SIZE
 FPS = 10
+HIGH_SCORE_FILE = "highscore.txt"
 
 BLACK = (0, 0, 0)
 GREEN = (0, 200, 0)

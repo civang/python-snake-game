@@ -5,6 +5,7 @@ from array import array
 import pygame
 
 from food import Food
+from game_utils import get_difficulty_fps, load_high_score, save_high_score
 from settings import (
     BLACK,
     CELL_SIZE,
@@ -64,6 +65,7 @@ def draw_text(text, font, color, center):
 
 
 def show_start_screen():
+    difficulty = "medium"
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -72,21 +74,29 @@ def show_start_screen():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    return
+                    return difficulty
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+                if event.key == pygame.K_1:
+                    difficulty = "easy"
+                if event.key == pygame.K_2:
+                    difficulty = "medium"
+                if event.key == pygame.K_3:
+                    difficulty = "hard"
 
         screen.fill(BLACK)
-        draw_text("Snake Game", title_font, GREEN, (WIDTH // 2, HEIGHT // 2 - 80))
-        draw_text("Press ENTER to start", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2))
-        draw_text("Use arrow keys to move", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 40))
-        draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 80))
+        draw_text("Snake Game", title_font, GREEN, (WIDTH // 2, HEIGHT // 2 - 120))
+        draw_text("Press ENTER to start", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 40))
+        draw_text("Use arrow keys to move", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2))
+        draw_text("Difficulty: 1 Easy  2 Medium  3 Hard", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 40))
+        draw_text(f"Current: {difficulty.title()}", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 80))
+        draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 120))
         pygame.display.flip()
         clock.tick(15)
 
 
-def show_game_over_screen(score):
+def show_game_over_screen(score, high_score):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -101,11 +111,12 @@ def show_game_over_screen(score):
                     return "quit"
 
         screen.fill(BLACK)
-        draw_text("Game Over", title_font, RED, (WIDTH // 2, HEIGHT // 2 - 100))
-        draw_text(f"Final Score: {score}", title_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 20))
-        draw_text("Press ENTER to play again", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 40))
-        draw_text("Press M for Main Menu", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 80))
-        draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 120))
+        draw_text("Game Over", title_font, RED, (WIDTH // 2, HEIGHT // 2 - 120))
+        draw_text(f"Final Score: {score}", title_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 40))
+        draw_text(f"High Score: {high_score}", title_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 20))
+        draw_text("Press ENTER to play again", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 80))
+        draw_text("Press M for Main Menu", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 120))
+        draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 160))
         pygame.display.flip()
         clock.tick(15)
 
@@ -127,12 +138,15 @@ def draw_music_bar(frame_offset):
         pygame.draw.rect(screen, GREEN, (rect_x, rect_y, 10, rect_height))
 
 
-def run_game():
+def run_game(difficulty):
     snake = Snake()
     food = Food(snake.body)
     score = 0
     running = True
+    paused = False
     music_counter = 0
+    fps = get_difficulty_fps(difficulty)
+    high_score = load_high_score()
 
     while running:
         for event in pygame.event.get():
@@ -141,7 +155,9 @@ def run_game():
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_p:
+                    paused = not paused
+                elif event.key == pygame.K_UP:
                     snake.change_direction((0, -1))
                 elif event.key == pygame.K_DOWN:
                     snake.change_direction((0, 1))
@@ -150,15 +166,18 @@ def run_game():
                 elif event.key == pygame.K_RIGHT:
                     snake.change_direction((1, 0))
 
-        ate_food = snake.head() == food.position
-        snake.move(grow=ate_food)
+        if not paused:
+            ate_food = snake.head() == food.position
+            snake.move(grow=ate_food)
 
-        if ate_food:
-            score += 1
-            food = Food(snake.body)
+            if ate_food:
+                score += 1
+                if score > high_score:
+                    high_score = score
+                food = Food(snake.body)
 
-        if snake.is_out_of_bounds() or snake.collides_with_self():
-            running = False
+            if snake.is_out_of_bounds() or snake.collides_with_self():
+                running = False
 
         screen.fill(BLACK)
 
@@ -177,7 +196,12 @@ def run_game():
             )
 
         score_text = score_font.render(f"Score: {score}", True, WHITE)
+        high_score_text = score_font.render(f"High Score: {high_score}", True, GREEN)
         screen.blit(score_text, (10, 10))
+        screen.blit(high_score_text, (10, 40))
+
+        if paused:
+            draw_text("Paused", title_font, WHITE, (WIDTH // 2, HEIGHT // 2))
 
         frame_offset = pygame.time.get_ticks() / 240.0
         draw_music_bar(frame_offset)
@@ -189,18 +213,19 @@ def run_game():
 
         music_counter += 1
         pygame.display.update()
-        clock.tick(FPS)
+        clock.tick(fps)
 
-    return score
+    save_high_score(score)
+    return score, high_score
 
 
 def main():
     while True:
-        show_start_screen()
+        difficulty = show_start_screen()
 
         while True:
-            final_score = run_game()
-            choice = show_game_over_screen(final_score)
+            final_score, high_score = run_game(difficulty)
+            choice = show_game_over_screen(final_score, high_score)
 
             if choice == "play_again":
                 continue

@@ -12,6 +12,9 @@ A classic Snake Game built using Python and Pygame. Enjoy the retro gaming exper
 - Wall collision
 - Self collision
 - Game over screen with replay support
+- Pause and resume with P
+- Difficulty selection (Easy, Medium, Hard)
+- Persistent high score tracking
 - Darker green snake body color for better visibility
 
 ## Technologies Used
@@ -42,11 +45,9 @@ py main.py
 
 ## Future Improvements
 
-- High score system
-- Pause menu
-- Difficulty levels
 - Sound effects
 - Better graphics
+- Obstacles and power-ups
 
 ## Learning Goals
 
