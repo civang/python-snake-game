@@ -51,6 +51,7 @@ py main.py
 - Additional game modes
 - Leaderboard support
 - Daily challenge mode
+- Score-based speed boosts
 
 ## Learning Goals
 
