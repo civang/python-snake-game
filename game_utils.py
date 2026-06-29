@@ -29,3 +29,7 @@ def save_high_score(score, path=None):
     current_high_score = load_high_score(path)
     if score > current_high_score:
         path.write_text(str(score), encoding="utf-8")
+
+
+def get_pause_message(paused):
+    return "Press C to continue" if paused else "Press P to pause"

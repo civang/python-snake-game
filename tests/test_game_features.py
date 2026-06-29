@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from game_utils import get_difficulty_fps, load_high_score, save_high_score
+from game_utils import get_difficulty_fps, get_pause_message, load_high_score, save_high_score
 
 
 class GameFeatureTests(unittest.TestCase):
@@ -20,6 +20,10 @@ class GameFeatureTests(unittest.TestCase):
 
             save_high_score(8, high_score_path)
             self.assertEqual(load_high_score(high_score_path), 12)
+
+    def test_pause_message(self):
+        self.assertEqual(get_pause_message(False), "Press P to pause")
+        self.assertEqual(get_pause_message(True), "Press C to continue")
 
 
 if __name__ == "__main__":

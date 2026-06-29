@@ -5,7 +5,7 @@ from array import array
 import pygame
 
 from food import Food
-from game_utils import get_difficulty_fps, load_high_score, save_high_score
+from game_utils import get_difficulty_fps, get_pause_message, load_high_score, save_high_score
 from settings import (
     BLACK,
     CELL_SIZE,
@@ -157,6 +157,8 @@ def run_game(difficulty):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = not paused
+                elif event.key == pygame.K_c and paused:
+                    paused = False
                 elif event.key == pygame.K_UP:
                     snake.change_direction((0, -1))
                 elif event.key == pygame.K_DOWN:
@@ -201,7 +203,8 @@ def run_game(difficulty):
         screen.blit(high_score_text, (10, 40))
 
         if paused:
-            draw_text("Paused", title_font, WHITE, (WIDTH // 2, HEIGHT // 2))
+            draw_text("Paused", title_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 20))
+            draw_text(get_pause_message(paused), menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 20))
 
         frame_offset = pygame.time.get_ticks() / 240.0
         draw_music_bar(frame_offset)
