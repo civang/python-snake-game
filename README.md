@@ -48,6 +48,7 @@ py main.py
 - Sound effects
 - Better graphics
 - Obstacles and power-ups
+- Additional game modes
 
 ## Learning Goals
 
