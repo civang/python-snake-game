@@ -42,6 +42,34 @@ py main.py
 - `snake.py` – snake movement and collision logic
 - `food.py` – food spawning and position management
 - `settings.py` – shared game configuration constants
+- `scripts/generate_commits.py` – optional local commit generator for GitHub contribution testing
+
+## Generating Many Commits
+
+If you want to create many local commits to populate a GitHub contribution graph, use `generate_commits.py`.
+
+1. Confirm your Git identity matches your GitHub account:
+
+```powershell
+git config user.name "Your Name"
+git config user.email "you@example.com"
+```
+
+2. Generate commits in the current repo:
+
+```powershell
+python generate_commits.py --count 200 --days 60
+```
+
+3. Push them to your remote repository branch:
+
+```powershell
+git push origin HEAD
+```
+
+4. Verify the author email matches a verified email on GitHub and wait a few minutes for GitHub to update your contribution graph.
+
+> If commits still do not appear, check `git log --oneline --format="%h %an <%ae> %ad" -n 5` to confirm the author email and date.
 
 ## Future Improvements
 

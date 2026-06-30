@@ -28,14 +28,45 @@ try:
 except pygame.error:
     audio_enabled = False
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Snake Game")
 
 clock = pygame.time.Clock()
 
-title_font = pygame.font.SysFont(None, 64)
-menu_font = pygame.font.SysFont(None, 36)
-score_font = pygame.font.SysFont(None, 28)
+# initialize fonts to None; they will be created in recompute_layout
+title_font = None
+menu_font = None
+score_font = None
+
+# Current window size and rendering layout (updated on resize)
+win_width, win_height = WIDTH, HEIGHT
+cell_render_size = CELL_SIZE
+offset_x = 0
+offset_y = 0
+
+
+def recompute_layout(w, h):
+    global win_width, win_height, cell_render_size, offset_x, offset_y
+    global title_font, menu_font, score_font
+    win_width, win_height = w, h
+    # Determine the largest integer cell size that fits the logical grid
+    cell_render_size = max(4, min(win_width // COLS, win_height // ROWS))
+    grid_w = cell_render_size * COLS
+    grid_h = cell_render_size * ROWS
+    offset_x = (win_width - grid_w) // 2
+    offset_y = (win_height - grid_h) // 2
+
+    # Recreate fonts scaled to window width for readability
+    title_size = max(24, win_width // 12)
+    menu_size = max(14, win_width // 34)
+    score_size = max(12, win_width // 48)
+    title_font = pygame.font.SysFont(None, title_size)
+    menu_font = pygame.font.SysFont(None, menu_size)
+    score_font = pygame.font.SysFont(None, score_size)
+
+
+# initialize layout and fonts
+recompute_layout(win_width, win_height)
 
 
 def build_tone(frequency, duration=0.12, volume=0.06):
@@ -126,20 +157,20 @@ def show_game_over_screen(score, high_score):
 
 
 def draw_music_bar(frame_offset):
-    bar_x = WIDTH - 120
+    bar_x = win_width - 140
     bar_y = 18
-    bar_width = 90
+    bar_width = 110
     bar_height = 18
 
-    draw_text("Music", score_font, WHITE, (bar_x + 45, bar_y - 10))
+    draw_text("Music", score_font, WHITE, (bar_x + bar_width // 2, bar_y - 10))
 
     for index in range(6):
         wave = abs(math.sin(frame_offset + index * 0.7))
         height = int(6 + wave * 12)
         rect_height = max(4, height)
         rect_y = bar_y + (bar_height - rect_height) // 2
-        rect_x = bar_x + index * 14
-        pygame.draw.rect(screen, GREEN, (rect_x, rect_y, 10, rect_height))
+        rect_x = bar_x + index * 16
+        pygame.draw.rect(screen, GREEN, (rect_x, rect_y, 12, rect_height))
 
 
 def run_game(difficulty):
@@ -157,6 +188,12 @@ def run_game(difficulty):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == pygame.VIDEORESIZE:
+                # rebuild screen surface and layout for new size
+                global screen
+                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                recompute_layout(event.w, event.h)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
@@ -187,10 +224,17 @@ def run_game(difficulty):
 
         screen.fill(BLACK)
 
+        # Draw food and snake using scaled cell size and centered grid
+        fx, fy = food.position
         pygame.draw.rect(
             screen,
             RED,
-            (food.position[0] * CELL_SIZE, food.position[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+            (
+                offset_x + fx * cell_render_size,
+                offset_y + fy * cell_render_size,
+                cell_render_size,
+                cell_render_size,
+            ),
         )
 
         for segment in snake.body:
@@ -198,7 +242,12 @@ def run_game(difficulty):
             pygame.draw.rect(
                 screen,
                 GREEN,
-                (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+                (
+                    offset_x + x * cell_render_size,
+                    offset_y + y * cell_render_size,
+                    cell_render_size,
+                    cell_render_size,
+                ),
             )
 
         score_text = score_font.render(f"Score: {score}", True, WHITE)
@@ -207,8 +256,8 @@ def run_game(difficulty):
         screen.blit(high_score_text, (10, 40))
 
         if paused:
-            draw_text("Paused", title_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 20))
-            draw_text(get_pause_message(paused), menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 20))
+            draw_text("Paused", title_font, WHITE, (win_width // 2, win_height // 2 - 20))
+            draw_text(get_pause_message(paused), menu_font, GREEN, (win_width // 2, win_height // 2 + 20))
 
         frame_offset = pygame.time.get_ticks() / 240.0
         draw_music_bar(frame_offset)
