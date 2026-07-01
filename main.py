@@ -95,6 +95,12 @@ def draw_text(text, font, color, center):
     screen.blit(label, rect)
 
 
+def draw_panel(x, y, width, height, color, border_color, radius=18):
+    pygame.draw.rect(screen, (0, 0, 0), (x + 4, y + 4, width, height), border_radius=radius)
+    pygame.draw.rect(screen, color, (x, y, width, height), border_radius=radius)
+    pygame.draw.rect(screen, border_color, (x, y, width, height), width=3, border_radius=radius)
+
+
 def show_start_screen():
     difficulty = "medium"
     while True:
@@ -117,16 +123,28 @@ def show_start_screen():
                     difficulty = "hard"
 
         screen.fill(BLACK)
-        draw_text("Snake Game", title_font, GREEN, (WIDTH // 2, HEIGHT // 2 - 120))
-        draw_text("Press ENTER to start", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 - 40))
-        draw_text("Use arrow keys to move", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2))
-        draw_text("Difficulty: 1 Easy  2 Medium  3 Hard", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 40))
-        draw_text(f"Current: {difficulty.title()}", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 80))
-        draw_text("Press ESC to quit", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 120))
-        draw_text("Press 1/2/3 to change difficulty", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 160))
-        draw_text("Press P during play to pause", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 200))
-        draw_text("Eat more food to speed up", menu_font, GREEN, (WIDTH // 2, HEIGHT // 2 + 240))
-        draw_text("Try different difficulties", menu_font, WHITE, (WIDTH // 2, HEIGHT // 2 + 280))
+
+        for x in range(0, win_width, 40):
+            pygame.draw.line(screen, (18, 28, 18), (x, 0), (x, win_height), 1)
+        for y in range(0, win_height, 40):
+            pygame.draw.line(screen, (18, 28, 18), (0, y), (win_width, y), 1)
+
+        panel_width = min(560, max(340, win_width - 80))
+        panel_height = min(420, max(320, win_height - 80))
+        panel_x = (win_width - panel_width) // 2
+        panel_y = (win_height - panel_height) // 2
+        draw_panel(panel_x, panel_y, panel_width, panel_height, (18, 24, 18), GREEN, 24)
+
+        draw_text("SNAKE", title_font, (0, 0, 0), (win_width // 2 + 3, panel_y + 70 + 3))
+        draw_text("SNAKE", title_font, GREEN, (win_width // 2, panel_y + 70))
+        draw_text("Classic Arcade", menu_font, WHITE, (win_width // 2, panel_y + 120))
+        draw_text("Press ENTER to start", menu_font, (255, 255, 255), (win_width // 2, panel_y + 170))
+        draw_text("Use arrow keys to move", menu_font, (220, 220, 220), (win_width // 2, panel_y + 210))
+        draw_text("Difficulty: 1 Easy   2 Medium   3 Hard", menu_font, (230, 230, 230), (win_width // 2, panel_y + 250))
+        draw_text(f"Current: {difficulty.title()}", menu_font, GREEN, (win_width // 2, panel_y + 290))
+        draw_text("P = pause  •  ESC = quit", menu_font, (200, 200, 200), (win_width // 2, panel_y + 330))
+        draw_text("Eat food to grow faster and score more", menu_font, (180, 220, 180), (win_width // 2, panel_y + 366))
+
         pygame.display.flip()
         clock.tick(15)
 
