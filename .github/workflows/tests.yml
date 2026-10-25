@@ -1,0 +1,22 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The tested helpers in game_utils.py don't need pygame, so there is
+      # nothing to install and no display to fake.
+      - name: Run tests
+        run: PYTHONPATH=. python -m unittest discover -s tests -v
