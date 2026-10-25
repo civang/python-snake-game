@@ -1,5 +1,7 @@
 # Snake Game
 
+[![tests](https://github.com/civang/python-snake-game/actions/workflows/tests.yml/badge.svg)](https://github.com/civang/python-snake-game/actions/workflows/tests.yml)
+
 A classic Snake Game built using Python and Pygame. Enjoy the retro gaming experience!
 
 ## Features
